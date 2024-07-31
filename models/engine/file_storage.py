@@ -19,25 +19,28 @@ class FileStorage:
     """
     __file_path = "file.json"
     __objects = {}
+    all_classes = {'BaseModel': BaseModel, 'User': User,
+                   'State': State, 'City': City, 'Amenity': Amenity,
+                   'Place': Place, 'Review': Review}
 
     def all(self, cls=None):
-        """Returns all the objects
-
-        If a class is specified, the method only
-        returns the objects of same type.
-
+        """returns a dictionary
+        Return:
+            returns a dictionary of __object
         """
+        all_return = {}
 
+        # if cls is valid
         if cls:
-            same_type = dict()
+            if cls.__name__ in self.all_classes:
+                # copy objects of cls to temp dict
+                for key, val in self.__objects.items():
+                    if key.split('.')[0] == cls.__name__:
+                        all_return.update({key: val})
+        else:  # if cls is none
+            all_return = self.__objects
 
-            for key, obj in self.__objects.items():
-                if obj.__class__ == cls:
-                    same_type[key] = obj
-
-            return same_type
-
-        return self.__objects
+        return all_return
 
     def new(self, obj):
         """sets __object to given obj
@@ -76,7 +79,6 @@ class FileStorage:
 
             if self.__objects[key]:
                 del self.__objects[key]
-                self.save()
 
     def close(self):
         """Deserialize the JSON file to objects
